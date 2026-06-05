@@ -174,7 +174,7 @@
 <header>
   <p>
     this is the museum of my past life as a smoker.<br>
-    to all the lighters i've bought, found, stolen, lost and the ones which remain.
+    to all the lighters i've bought, found, stolen, lost and the ones that remain.
   </p>
 </header>
 
@@ -535,30 +535,64 @@ document.addEventListener('mousemove', function(e) {
   tooltip.style.top  = e.clientY + 'px';
 });
 
-document.querySelectorAll('.lighter').forEach(function(el) {
+// Added 'index' here to uniquely identify each lighter on the page
+document.querySelectorAll('.lighter').forEach(function(el, index) {
+
+  // 1. Create a unique save key for this specific lighter
+  var storageKey = 'lighter_count_' + index;
+
+  // 2. Grab the badge and span so we can update them immediately
+  var badge = el.querySelector('.lighter-count');
+  var span  = badge.querySelector('span');
+
+  // 3. Check for saved clicks when the site loads
+  var savedClicks = localStorage.getItem(storageKey);
+  
+  if (savedClicks) {
+    span.textContent = savedClicks;
+    badge.style.display = 'flex'; // Keep the badge visible if they've clicked before
+    el._clicks = parseInt(savedClicks); // Keep the internal click tracker synced
+  } else {
+    el._clicks = 0; // Start at 0 if no saved data
+  }
 
   // hover → show tooltip + instantly swap to back, restore on leave
   el.addEventListener('mouseenter', function() {
-    tooltip.textContent = 'i have the same';
+    
+    // Check if the saved clicks are already at 10 so the tooltip stays correct after a reload
+    if (el._clicks >= 10) {
+      tooltip.textContent = "it's mine you thief";
+    } else {
+      tooltip.textContent = 'i have the same';
+    }
+    
     tooltip.style.display = 'flex';
-    if (el._photos.length >= 2) {
+    
+    if (el._photos && el._photos.length >= 2) {
       el.querySelector('img.front').src = el._photos[1];
     }
   });
 
   el.addEventListener('mouseleave', function() {
     tooltip.style.display = 'none';
-    el.querySelector('img.front').src = el._photos[0];
+    if (el._photos && el._photos.length > 0) {
+      el.querySelector('img.front').src = el._photos[0];
+    }
   });
 
   // left-click → increment counter, change tooltip at 10 consecutive clicks
   el.addEventListener('click', function() {
-    var badge = el.querySelector('.lighter-count');
-    var span  = badge.querySelector('span');
-    var n = parseInt(span.textContent) + 1;
+    // We use "|| 0" just in case the span is totally empty on the first click
+    var n = (parseInt(span.textContent) || 0) + 1;
+    
     span.textContent = n;
     badge.style.display = 'flex';
+    
     el._clicks = (el._clicks || 0) + 1;
+    
+    // 4. Save the newly updated count to localStorage
+    localStorage.setItem(storageKey, n);
+
     if (el._clicks >= 10) {
       tooltip.textContent = "it's mine you thief";
     }
