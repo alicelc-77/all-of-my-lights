@@ -1,10 +1,12 @@
-<html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>the museum of my past life as a smoker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Cutive&amp;family=Cutive+Mono&amp;display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cutive&family=Cutive+Mono&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -47,11 +49,17 @@
     width: 100%;
     height: auto;
     display: block;
-    transition: opacity 0.2s ease;
   }
 
-  .lighter img.front { display: block; }
-  .lighter img.back  { display: none; }
+  .lighter img.back-overlay {
+    position: fixed;
+    width: 434px;
+    height: auto;
+    display: none;
+    z-index: 7000;
+    pointer-events: none;
+    transform: translate(-50%, -100%);
+  }
 
   footer {
     text-align: center;
@@ -70,7 +78,6 @@
     align-items: center;
     gap: 0;
     border: 1px solid #D9D9D9;
-    border-radius: 0;
     padding: 9px 14px;
     width: 381px;
     box-sizing: border-box;
@@ -97,16 +104,6 @@
     align-items: flex-end;
   }
 
-  @media (max-width: 900px) {
-    .grid {
-      grid-template-columns: repeat(3, 1fr);
-      padding: 20px 30px 80px;
-      row-gap: 50px;
-    }
-    .lighter { width: 80px !important; }
-  }
-
-  
   /* tooltip */
   #hover-label {
     position: fixed;
@@ -114,8 +111,8 @@
     z-index: 8000;
     display: none;
     box-sizing: border-box;
-    width: 106px;
     height: 25px;
+    padding: 0 8px;
     background: #fff;
     border: 1px solid #000;
     font-family: 'Cutive', serif;
@@ -126,68 +123,44 @@
     transform: translate(12px, -50%);
   }
 
-  /* counter pill — floats right of lighter, vertically centered */
-  .lighter-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
+  /* counter badge */
   .lighter-count {
     position: absolute;
-    left: calc(100% + 6px);
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
     width: 32px;
     height: 25px;
+    left: 110px;
+    top: 176px;
     border-radius: 4000px;
-    border: 0.2px solid #000;
+    pointer-events: none;
     display: none;
     align-items: center;
     justify-content: center;
   }
   .lighter-count span {
-    font-family: 'Cutive Mono', monospace;
+    position: absolute;
+    width: 17px;
+    height: 25px;
+    left: 8px;
+    top: 0px;
+    font-family: 'Cutive Mono';
+    font-style: normal;
     font-weight: 400;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 180%;
     text-align: center;
-    color: #000;
+    color: #000000;
+    -webkit-text-stroke: 0.2px #000000;
+    text-stroke: 0.2px #000000;
   }
 
-  /* extra photo panel */
-  #photo-panel {
-    position: fixed;
-    z-index: 9000;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 14px 16px 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    font-family: monospace;
-    font-size: 12px;
-    min-width: 200px;
-    display: none;
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: repeat(3, 1fr);
+      padding: 20px 30px 80px;
+      row-gap: 50px;
+    }
+    .lighter { width: 80px !important; }
   }
-  #photo-panel h4 {
-    margin: 0 0 10px;
-    font-size: 12px;
-    font-weight: 600;
-  }
-  .photo-slot { margin-bottom: 10px; }
-  .photo-slot label { display: block; color: #888; margin-bottom: 3px; }
-  .photo-slot img {
-    max-width: 70px; height: auto;
-    display: none; margin-top: 4px;
-    border: 1px solid #eee;
-  }
-  .photo-slot input[type=file] { font-size: 11px; width: 100%; }
-  #photo-panel-close {
-    position: absolute; top: 8px; right: 10px;
-    background: none; border: none; cursor: pointer;
-    font-size: 16px; color: #aaa; line-height: 1;
-  }
-
 </style>
 </head>
 <body>
@@ -201,421 +174,234 @@
 
 <div class="grid" id="grid"></div>
 
-<!-- PREVIEW CONTROLS — delete this whole block when done -->
-<style>
-#controls{position:fixed;top:20px;right:20px;background:#fff;border:1px solid #ddd;border-radius:10px;width:300px;font-family:monospace;font-size:12px;box-shadow:0 4px 20px rgba(0,0,0,0.12);z-index:9999;display:none;flex-direction:column;max-height:92vh;}
-#ctrl-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px 0;}
-#ctrl-tabs{display:flex;padding:10px 18px 0;border-bottom:1px solid #eee;}
-#ctrl-tabs button{background:none;border:none;border-bottom:2px solid transparent;padding:4px 10px 8px;cursor:pointer;font-family:monospace;font-size:12px;color:#888;}
-#ctrl-tabs button.active{border-bottom-color:#111;color:#111;font-weight:600;}
-#ctrl-body{overflow-y:auto;padding:16px 18px 14px;flex:1;}
-.srow{display:flex;justify-content:space-between;margin-bottom:3px;}
-.srow label{color:#555;}
-.srow span{color:#111;font-weight:600;}
-input[type=range]{width:100%;margin-bottom:12px;display:block;}
-.cbtn{width:100%;padding:8px;background:#111;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:monospace;margin-top:4px;}
-#drag-hint{font-size:11px;color:#888;margin-bottom:10px;line-height:1.5;}
-#size-hint{font-size:11px;color:#aaa;margin-top:-8px;margin-bottom:12px;}
-.lighter{transition:box-shadow 0.15s;}
-.lighter.drag-over{box-shadow:0 0 0 2px #111;}
-.lighter.dragging{opacity:0.35;}
-</style>
-
-<div id="controls">
-  <div id="ctrl-head">
-    <span style="font-weight:600;font-size:13px;">live editor</span>
-    <button onclick="document.getElementById('controls').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:18px;color:#aaa;padding:0;line-height:1;">×</button>
-  </div>
-  <div id="ctrl-tabs">
-    <button class="active" onclick="switchTab('global',this)">global</button>
-    <button onclick="switchTab('individual',this)">individual</button>
-  </div>
-  <div id="ctrl-body">
-
-    <div id="tab-global">
-      <div class="srow"><label>lighter width</label><span id="v-w">62px</span></div>
-      <input type="range" min="40" max="300" step="2" value="62" id="s-w" oninput="applyGlobal()">
-      <div class="srow"><label>columns</label><span id="v-cols">6</span></div>
-      <input type="range" min="2" max="8" step="1" value="6" id="s-cols" oninput="applyGlobal()">
-      <div class="srow"><label>row gap</label><span id="v-rg">82px</span></div>
-      <input type="range" min="10" max="240" step="2" value="82" id="s-rg" oninput="applyGlobal()">
-      <div class="srow"><label>column gap</label><span id="v-cg">0px</span></div>
-      <input type="range" min="0" max="120" step="2" value="0" id="s-cg" oninput="applyGlobal()">
-      <div class="srow"><label>side padding</label><span id="v-pad">80px</span></div>
-      <input type="range" min="20" max="200" step="2" value="80" id="s-pad" oninput="applyGlobal()">
-      <div class="srow"><label>header spacing</label><span id="v-hpad">62px</span></div>
-      <input type="range" min="10" max="160" step="2" value="62" id="s-hpad" oninput="applyGlobal()">
-      <button class="cbtn" onclick="copyGlobal()">copy CSS</button>
-    </div>
-
-    <div id="tab-individual" style="display:none;">
-      <p id="drag-hint">Drag any lighter to a new slot.<br>Click a lighter to resize it.</p>
-      <div id="ind-size" style="display:none;">
-        <div class="srow"><label>width of selected</label><span id="v-iw">62px</span></div>
-        <input type="range" min="20" max="300" step="2" value="62" id="s-iw" oninput="applyInd()">
-        <p id="size-hint">click elsewhere to deselect</p>
-      </div>
-      <button class="cbtn" onclick="copyAll()" style="margin-top:8px;">copy all overrides</button>
-    </div>
-
-  </div>
-</div>
-
-<script>
-var order = [];
-var sizes = {};
-var selEl = null;
-
-function switchTab(name,btn){
-  document.querySelectorAll('#ctrl-tabs button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tab-global').style.display = name==='global'?'block':'none';
-  document.getElementById('tab-individual').style.display = name==='individual'?'block':'none';
-  if(name==='individual') initDrag();
-}
-
-function initDrag(){
-  if(order.length) return;
-  var els = Array.from(document.querySelectorAll('.lighter'));
-  order = els.map((_,i)=>i);
-  els.forEach(function(el,i){
-    el.dataset.idx = i;
-    el.draggable = true;
-    el.addEventListener('dragstart',onDragStart);
-    el.addEventListener('dragover',onDragOver);
-    el.addEventListener('dragleave',onDragLeave);
-    el.addEventListener('drop',onDrop);
-    el.addEventListener('dragend',onDragEnd);
-    el.addEventListener('click',onClickLighter);
-  });
-}
-
-var dragSrc = null;
-
-function onDragStart(e){
-  dragSrc = this;
-  this.classList.add('dragging');
-  e.dataTransfer.effectAllowed='move';
-}
-function onDragOver(e){
-  e.preventDefault();
-  e.dataTransfer.dropEffect='move';
-  if(this!==dragSrc) this.classList.add('drag-over');
-}
-function onDragLeave(){ this.classList.remove('drag-over'); }
-function onDrop(e){
-  e.preventDefault();
-  this.classList.remove('drag-over');
-  if(this===dragSrc) return;
-  var g = document.getElementById('grid');
-  var els = Array.from(g.children);
-  var ai = els.indexOf(dragSrc);
-  var bi = els.indexOf(this);
-  if(ai<bi){ g.insertBefore(dragSrc,this.nextSibling); }
-  else { g.insertBefore(dragSrc,this); }
-  updateOrder();
-}
-function onDragEnd(){ this.classList.remove('dragging'); }
-
-function onClickLighter(e){
-  e.stopPropagation();
-  if(selEl) selEl.style.outline='';
-  selEl = this;
-  this.style.outline='2px solid #111';
-  var w = sizes[this.dataset.idx] || parseInt(this.style.width) || 62;
-  document.getElementById('s-iw').value = w;
-  document.getElementById('v-iw').textContent = w+'px';
-  document.getElementById('ind-size').style.display='block';
-}
-document.addEventListener('click',function(){
-  if(selEl){ selEl.style.outline=''; selEl=null; document.getElementById('ind-size').style.display='none';}
-});
-
-function applyInd(){
-  if(!selEl) return;
-  var w = document.getElementById('s-iw').value;
-  document.getElementById('v-iw').textContent = w+'px';
-  selEl.style.width = w+'px';
-  sizes[selEl.dataset.idx] = parseInt(w);
-}
-
-function updateOrder(){
-  order = Array.from(document.querySelectorAll('.lighter')).map(el=>parseInt(el.dataset.idx));
-}
-
-function applyGlobal(){
-  var w=document.getElementById('s-w').value;
-  var cols=document.getElementById('s-cols').value;
-  var rg=document.getElementById('s-rg').value;
-  var cg=document.getElementById('s-cg').value;
-  var pad=document.getElementById('s-pad').value;
-  var hpad=document.getElementById('s-hpad').value;
-  document.getElementById('v-w').textContent=w+'px';
-  document.getElementById('v-cols').textContent=cols;
-  document.getElementById('v-rg').textContent=rg+'px';
-  document.getElementById('v-cg').textContent=cg+'px';
-  document.getElementById('v-pad').textContent=pad+'px';
-  document.getElementById('v-hpad').textContent=hpad+'px';
-  var g=document.getElementById('grid');
-  g.style.gridTemplateColumns='repeat('+cols+', 1fr)';
-  g.style.rowGap=rg+'px';
-  g.style.columnGap=cg+'px';
-  g.style.padding='20px '+pad+'px 120px';
-  document.querySelectorAll('.lighter').forEach(function(el){
-    if(!sizes[el.dataset.idx]) el.style.width=w+'px';
-  });
-  document.querySelector('header').style.paddingBottom=hpad+'px';
-}
-
-function copyGlobal(){
-  var w=document.getElementById('s-w').value,cols=document.getElementById('s-cols').value,
-      rg=document.getElementById('s-rg').value,cg=document.getElementById('s-cg').value,
-      pad=document.getElementById('s-pad').value,hpad=document.getElementById('s-hpad').value;
-  var css='header {\n  padding: 60px 20px '+hpad+'px;\n}\n\n.grid {\n  max-width: 1440px;\n  margin: 0 auto;\n  padding: 20px '+pad+'px 120px;\n  display: grid;\n  grid-template-columns: repeat('+cols+', 1fr);\n  row-gap: '+rg+'px;\n  column-gap: '+cg+'px;\n  justify-items: center;\n  align-items: end;\n}\n\n.lighter {\n  position: relative;\n  width: '+w+'px;\n  cursor: default;\n}';
-  navigator.clipboard.writeText(css).then(function(){
-    var btn=document.querySelector('#tab-global .cbtn');
-    btn.textContent='copied!';setTimeout(function(){btn.textContent='copy CSS';},1500);
-  });
-}
-
-function copyAll(){
-  updateOrder();
-  var lines=[];
-  // Order as JS array comment
-  lines.push('/* drag order (original indices): ['+order.join(',')+'] */');
-  lines.push('/* To apply: reorder your lighters array in JS to match */');
-  lines.push('');
-  // Individual size overrides
-  Object.keys(sizes).forEach(function(idx){
-    lines.push('.lighter[data-idx="'+idx+'"] { width: '+sizes[idx]+'px; }');
-  });
-  var out = lines.join('\n') || '/* no overrides yet */';
-  navigator.clipboard.writeText(out).then(function(){
-    var btn=document.querySelector('#tab-individual .cbtn');
-    btn.textContent='copied!';setTimeout(function(){btn.textContent='copy all overrides';},1500);
-  });
-}
-</script>
-<!-- END PREVIEW CONTROLS -->
+<div id="hover-label">i have the same</div>
 
 <footer>
   <p>all of my lights</p>
   <div id="player">
     <button id="play-btn" onclick="togglePlay()" aria-label="Play">
       <svg id="icon-play" width="15" height="17" viewBox="0 0 15 17" fill="none">
-        <path d="M1 1L14 8.5L1 16V1Z" fill="black"></path>
+        <path d="M1 1L14 8.5L1 16V1Z" fill="black"/>
       </svg>
       <svg id="icon-pause" width="14" height="16" viewBox="0 0 14 16" fill="none" style="display:none">
-        <rect x="0" y="0" width="4" height="16" fill="black"></rect>
-        <rect x="9" y="0" width="4" height="16" fill="black"></rect>
+        <rect x="0" y="0" width="4" height="16" fill="black"/>
+        <rect x="9" y="0" width="4" height="16" fill="black"/>
       </svg>
     </button>
     <div id="waveform-wrap" onclick="seek(event)">
       <svg id="waveform" viewBox="0 0 310.00 26" preserveAspectRatio="none" style="width:100%;height:26px;">
         <g id="wave-played" color="#000" clip-path="url(#clip-played)">
-          <rect x="0.00" y="7.66" width="1.24" height="18.34" fill="currentColor"></rect>
-      <rect x="3.72" y="7.51" width="1.24" height="18.49" fill="currentColor"></rect>
-      <rect x="7.44" y="14.78" width="1.24" height="11.22" fill="currentColor"></rect>
-      <rect x="11.16" y="9.15" width="1.24" height="16.85" fill="currentColor"></rect>
-      <rect x="14.88" y="17.06" width="1.24" height="8.94" fill="currentColor"></rect>
-      <rect x="18.60" y="14.81" width="1.24" height="11.19" fill="currentColor"></rect>
-      <rect x="22.32" y="5.55" width="1.24" height="20.45" fill="currentColor"></rect>
-      <rect x="26.04" y="6.78" width="1.24" height="19.22" fill="currentColor"></rect>
-      <rect x="29.76" y="13.88" width="1.24" height="12.12" fill="currentColor"></rect>
-      <rect x="33.48" y="10.98" width="1.24" height="15.02" fill="currentColor"></rect>
-      <rect x="37.20" y="19.08" width="1.24" height="6.92" fill="currentColor"></rect>
-      <rect x="40.92" y="15.67" width="1.24" height="10.33" fill="currentColor"></rect>
-      <rect x="44.64" y="12.78" width="1.24" height="13.22" fill="currentColor"></rect>
-      <rect x="48.36" y="5.47" width="1.24" height="20.53" fill="currentColor"></rect>
-      <rect x="52.08" y="12.48" width="1.24" height="13.52" fill="currentColor"></rect>
-      <rect x="55.80" y="6.10" width="1.24" height="19.90" fill="currentColor"></rect>
-      <rect x="59.52" y="19.07" width="1.24" height="6.93" fill="currentColor"></rect>
-      <rect x="63.24" y="15.25" width="1.24" height="10.75" fill="currentColor"></rect>
-      <rect x="66.96" y="6.24" width="1.24" height="19.76" fill="currentColor"></rect>
-      <rect x="70.68" y="7.72" width="1.24" height="18.28" fill="currentColor"></rect>
-      <rect x="74.40" y="11.53" width="1.24" height="14.47" fill="currentColor"></rect>
-      <rect x="78.12" y="4.65" width="1.24" height="21.35" fill="currentColor"></rect>
-      <rect x="81.84" y="18.60" width="1.24" height="7.40" fill="currentColor"></rect>
-      <rect x="85.56" y="17.42" width="1.24" height="8.58" fill="currentColor"></rect>
-      <rect x="89.28" y="5.00" width="1.24" height="21.00" fill="currentColor"></rect>
-      <rect x="93.00" y="3.86" width="1.24" height="22.14" fill="currentColor"></rect>
-      <rect x="96.72" y="15.90" width="1.24" height="10.10" fill="currentColor"></rect>
-      <rect x="100.44" y="10.35" width="1.24" height="15.65" fill="currentColor"></rect>
-      <rect x="104.16" y="16.62" width="1.24" height="9.38" fill="currentColor"></rect>
-      <rect x="107.88" y="15.18" width="1.24" height="10.82" fill="currentColor"></rect>
-      <rect x="111.60" y="6.26" width="1.24" height="19.74" fill="currentColor"></rect>
-      <rect x="115.32" y="-0.74" width="1.24" height="26.74" fill="currentColor"></rect>
-      <rect x="119.04" y="13.18" width="1.24" height="12.82" fill="currentColor"></rect>
-      <rect x="122.76" y="2.05" width="1.24" height="23.95" fill="currentColor"></rect>
-      <rect x="126.48" y="18.45" width="1.24" height="7.55" fill="currentColor"></rect>
-      <rect x="130.20" y="15.43" width="1.24" height="10.57" fill="currentColor"></rect>
-      <rect x="133.92" y="6.07" width="1.24" height="19.93" fill="currentColor"></rect>
-      <rect x="137.64" y="0.56" width="1.24" height="25.44" fill="currentColor"></rect>
-      <rect x="141.36" y="11.18" width="1.24" height="14.82" fill="currentColor"></rect>
-      <rect x="145.08" y="5.80" width="1.24" height="20.20" fill="currentColor"></rect>
-      <rect x="148.80" y="17.18" width="1.24" height="8.82" fill="currentColor"></rect>
-      <rect x="152.52" y="17.97" width="1.24" height="8.03" fill="currentColor"></rect>
-      <rect x="156.24" y="11.10" width="1.24" height="14.90" fill="currentColor"></rect>
-      <rect x="159.96" y="4.41" width="1.24" height="21.59" fill="currentColor"></rect>
-      <rect x="163.68" y="15.98" width="1.24" height="10.02" fill="currentColor"></rect>
-      <rect x="167.40" y="9.06" width="1.24" height="16.94" fill="currentColor"></rect>
-      <rect x="171.12" y="19.54" width="1.24" height="6.46" fill="currentColor"></rect>
-      <rect x="174.84" y="16.81" width="1.24" height="9.19" fill="currentColor"></rect>
-      <rect x="178.56" y="7.69" width="1.24" height="18.31" fill="currentColor"></rect>
-      <rect x="182.28" y="3.53" width="1.24" height="22.47" fill="currentColor"></rect>
-      <rect x="186.00" y="14.20" width="1.24" height="11.80" fill="currentColor"></rect>
-      <rect x="189.72" y="9.28" width="1.24" height="16.72" fill="currentColor"></rect>
-      <rect x="193.44" y="18.89" width="1.24" height="7.11" fill="currentColor"></rect>
-      <rect x="197.16" y="13.51" width="1.24" height="12.49" fill="currentColor"></rect>
-      <rect x="200.88" y="7.59" width="1.24" height="18.41" fill="currentColor"></rect>
-      <rect x="204.60" y="0.67" width="1.24" height="25.33" fill="currentColor"></rect>
-      <rect x="208.32" y="15.42" width="1.24" height="10.58" fill="currentColor"></rect>
-      <rect x="212.04" y="4.36" width="1.24" height="21.64" fill="currentColor"></rect>
-      <rect x="215.76" y="19.29" width="1.24" height="6.71" fill="currentColor"></rect>
-      <rect x="219.48" y="16.30" width="1.24" height="9.70" fill="currentColor"></rect>
-      <rect x="223.20" y="4.73" width="1.24" height="21.27" fill="currentColor"></rect>
-      <rect x="226.92" y="0.31" width="1.24" height="25.69" fill="currentColor"></rect>
-      <rect x="230.64" y="13.05" width="1.24" height="12.95" fill="currentColor"></rect>
-      <rect x="234.36" y="4.78" width="1.24" height="21.22" fill="currentColor"></rect>
-      <rect x="238.08" y="16.64" width="1.24" height="9.36" fill="currentColor"></rect>
-      <rect x="241.80" y="14.31" width="1.24" height="11.69" fill="currentColor"></rect>
-      <rect x="245.52" y="11.09" width="1.24" height="14.91" fill="currentColor"></rect>
-      <rect x="249.24" y="7.42" width="1.24" height="18.58" fill="currentColor"></rect>
-      <rect x="252.96" y="14.53" width="1.24" height="11.47" fill="currentColor"></rect>
-      <rect x="256.68" y="8.73" width="1.24" height="17.27" fill="currentColor"></rect>
-      <rect x="260.40" y="19.11" width="1.24" height="6.89" fill="currentColor"></rect>
-      <rect x="264.12" y="13.48" width="1.24" height="12.52" fill="currentColor"></rect>
-      <rect x="267.84" y="5.68" width="1.24" height="20.32" fill="currentColor"></rect>
-      <rect x="271.56" y="4.12" width="1.24" height="21.88" fill="currentColor"></rect>
-      <rect x="275.28" y="12.45" width="1.24" height="13.55" fill="currentColor"></rect>
-      <rect x="279.00" y="7.52" width="1.24" height="18.48" fill="currentColor"></rect>
-      <rect x="282.72" y="16.36" width="1.24" height="9.64" fill="currentColor"></rect>
-      <rect x="286.44" y="15.90" width="1.24" height="10.10" fill="currentColor"></rect>
-      <rect x="290.16" y="10.79" width="1.24" height="15.21" fill="currentColor"></rect>
-      <rect x="293.88" y="4.91" width="1.24" height="21.09" fill="currentColor"></rect>
-      <rect x="297.60" y="13.03" width="1.24" height="12.97" fill="currentColor"></rect>
-      <rect x="301.32" y="8.78" width="1.24" height="17.22" fill="currentColor"></rect>
-      <rect x="305.04" y="17.65" width="1.24" height="8.35" fill="currentColor"></rect>
-      <rect x="308.76" y="13.70" width="1.24" height="12.30" fill="currentColor"></rect>
+          <rect x="0.00" y="7.66" width="1.24" height="18.34" fill="currentColor"/>
+          <rect x="3.72" y="7.51" width="1.24" height="18.49" fill="currentColor"/>
+          <rect x="7.44" y="14.78" width="1.24" height="11.22" fill="currentColor"/>
+          <rect x="11.16" y="9.15" width="1.24" height="16.85" fill="currentColor"/>
+          <rect x="14.88" y="17.06" width="1.24" height="8.94" fill="currentColor"/>
+          <rect x="18.60" y="14.81" width="1.24" height="11.19" fill="currentColor"/>
+          <rect x="22.32" y="5.55" width="1.24" height="20.45" fill="currentColor"/>
+          <rect x="26.04" y="6.78" width="1.24" height="19.22" fill="currentColor"/>
+          <rect x="29.76" y="13.88" width="1.24" height="12.12" fill="currentColor"/>
+          <rect x="33.48" y="10.98" width="1.24" height="15.02" fill="currentColor"/>
+          <rect x="37.20" y="19.08" width="1.24" height="6.92" fill="currentColor"/>
+          <rect x="40.92" y="15.67" width="1.24" height="10.33" fill="currentColor"/>
+          <rect x="44.64" y="12.78" width="1.24" height="13.22" fill="currentColor"/>
+          <rect x="48.36" y="5.47" width="1.24" height="20.53" fill="currentColor"/>
+          <rect x="52.08" y="12.48" width="1.24" height="13.52" fill="currentColor"/>
+          <rect x="55.80" y="6.10" width="1.24" height="19.90" fill="currentColor"/>
+          <rect x="59.52" y="19.07" width="1.24" height="6.93" fill="currentColor"/>
+          <rect x="63.24" y="15.25" width="1.24" height="10.75" fill="currentColor"/>
+          <rect x="66.96" y="6.24" width="1.24" height="19.76" fill="currentColor"/>
+          <rect x="70.68" y="7.72" width="1.24" height="18.28" fill="currentColor"/>
+          <rect x="74.40" y="11.53" width="1.24" height="14.47" fill="currentColor"/>
+          <rect x="78.12" y="4.65" width="1.24" height="21.35" fill="currentColor"/>
+          <rect x="81.84" y="18.60" width="1.24" height="7.40" fill="currentColor"/>
+          <rect x="85.56" y="17.42" width="1.24" height="8.58" fill="currentColor"/>
+          <rect x="89.28" y="5.00" width="1.24" height="21.00" fill="currentColor"/>
+          <rect x="93.00" y="3.86" width="1.24" height="22.14" fill="currentColor"/>
+          <rect x="96.72" y="15.90" width="1.24" height="10.10" fill="currentColor"/>
+          <rect x="100.44" y="10.35" width="1.24" height="15.65" fill="currentColor"/>
+          <rect x="104.16" y="16.62" width="1.24" height="9.38" fill="currentColor"/>
+          <rect x="107.88" y="15.18" width="1.24" height="10.82" fill="currentColor"/>
+          <rect x="111.60" y="6.26" width="1.24" height="19.74" fill="currentColor"/>
+          <rect x="115.32" y="-0.74" width="1.24" height="26.74" fill="currentColor"/>
+          <rect x="119.04" y="13.18" width="1.24" height="12.82" fill="currentColor"/>
+          <rect x="122.76" y="2.05" width="1.24" height="23.95" fill="currentColor"/>
+          <rect x="126.48" y="18.45" width="1.24" height="7.55" fill="currentColor"/>
+          <rect x="130.20" y="15.43" width="1.24" height="10.57" fill="currentColor"/>
+          <rect x="133.92" y="6.07" width="1.24" height="19.93" fill="currentColor"/>
+          <rect x="137.64" y="0.56" width="1.24" height="25.44" fill="currentColor"/>
+          <rect x="141.36" y="11.18" width="1.24" height="14.82" fill="currentColor"/>
+          <rect x="145.08" y="5.80" width="1.24" height="20.20" fill="currentColor"/>
+          <rect x="148.80" y="17.18" width="1.24" height="8.82" fill="currentColor"/>
+          <rect x="152.52" y="17.97" width="1.24" height="8.03" fill="currentColor"/>
+          <rect x="156.24" y="11.10" width="1.24" height="14.90" fill="currentColor"/>
+          <rect x="159.96" y="4.41" width="1.24" height="21.59" fill="currentColor"/>
+          <rect x="163.68" y="15.98" width="1.24" height="10.02" fill="currentColor"/>
+          <rect x="167.40" y="9.06" width="1.24" height="16.94" fill="currentColor"/>
+          <rect x="171.12" y="19.54" width="1.24" height="6.46" fill="currentColor"/>
+          <rect x="174.84" y="16.81" width="1.24" height="9.19" fill="currentColor"/>
+          <rect x="178.56" y="7.69" width="1.24" height="18.31" fill="currentColor"/>
+          <rect x="182.28" y="3.53" width="1.24" height="22.47" fill="currentColor"/>
+          <rect x="186.00" y="14.20" width="1.24" height="11.80" fill="currentColor"/>
+          <rect x="189.72" y="9.28" width="1.24" height="16.72" fill="currentColor"/>
+          <rect x="193.44" y="18.89" width="1.24" height="7.11" fill="currentColor"/>
+          <rect x="197.16" y="13.51" width="1.24" height="12.49" fill="currentColor"/>
+          <rect x="200.88" y="7.59" width="1.24" height="18.41" fill="currentColor"/>
+          <rect x="204.60" y="0.67" width="1.24" height="25.33" fill="currentColor"/>
+          <rect x="208.32" y="15.42" width="1.24" height="10.58" fill="currentColor"/>
+          <rect x="212.04" y="4.36" width="1.24" height="21.64" fill="currentColor"/>
+          <rect x="215.76" y="19.29" width="1.24" height="6.71" fill="currentColor"/>
+          <rect x="219.48" y="16.30" width="1.24" height="9.70" fill="currentColor"/>
+          <rect x="223.20" y="4.73" width="1.24" height="21.27" fill="currentColor"/>
+          <rect x="226.92" y="0.31" width="1.24" height="25.69" fill="currentColor"/>
+          <rect x="230.64" y="13.05" width="1.24" height="12.95" fill="currentColor"/>
+          <rect x="234.36" y="4.78" width="1.24" height="21.22" fill="currentColor"/>
+          <rect x="238.08" y="16.64" width="1.24" height="9.36" fill="currentColor"/>
+          <rect x="241.80" y="14.31" width="1.24" height="11.69" fill="currentColor"/>
+          <rect x="245.52" y="11.09" width="1.24" height="14.91" fill="currentColor"/>
+          <rect x="249.24" y="7.42" width="1.24" height="18.58" fill="currentColor"/>
+          <rect x="252.96" y="14.53" width="1.24" height="11.47" fill="currentColor"/>
+          <rect x="256.68" y="8.73" width="1.24" height="17.27" fill="currentColor"/>
+          <rect x="260.40" y="19.11" width="1.24" height="6.89" fill="currentColor"/>
+          <rect x="264.12" y="13.48" width="1.24" height="12.52" fill="currentColor"/>
+          <rect x="267.84" y="5.68" width="1.24" height="20.32" fill="currentColor"/>
+          <rect x="271.56" y="4.12" width="1.24" height="21.88" fill="currentColor"/>
+          <rect x="275.28" y="12.45" width="1.24" height="13.55" fill="currentColor"/>
+          <rect x="279.00" y="7.52" width="1.24" height="18.48" fill="currentColor"/>
+          <rect x="282.72" y="16.36" width="1.24" height="9.64" fill="currentColor"/>
+          <rect x="286.44" y="15.90" width="1.24" height="10.10" fill="currentColor"/>
+          <rect x="290.16" y="10.79" width="1.24" height="15.21" fill="currentColor"/>
+          <rect x="293.88" y="4.91" width="1.24" height="21.09" fill="currentColor"/>
+          <rect x="297.60" y="13.03" width="1.24" height="12.97" fill="currentColor"/>
+          <rect x="301.32" y="8.78" width="1.24" height="17.22" fill="currentColor"/>
+          <rect x="305.04" y="17.65" width="1.24" height="8.35" fill="currentColor"/>
+          <rect x="308.76" y="13.70" width="1.24" height="12.30" fill="currentColor"/>
         </g>
         <g id="wave-unplayed" color="#ccc" clip-path="url(#clip-unplayed)">
-          <rect x="0.00" y="7.66" width="1.24" height="18.34" fill="currentColor"></rect>
-      <rect x="3.72" y="7.51" width="1.24" height="18.49" fill="currentColor"></rect>
-      <rect x="7.44" y="14.78" width="1.24" height="11.22" fill="currentColor"></rect>
-      <rect x="11.16" y="9.15" width="1.24" height="16.85" fill="currentColor"></rect>
-      <rect x="14.88" y="17.06" width="1.24" height="8.94" fill="currentColor"></rect>
-      <rect x="18.60" y="14.81" width="1.24" height="11.19" fill="currentColor"></rect>
-      <rect x="22.32" y="5.55" width="1.24" height="20.45" fill="currentColor"></rect>
-      <rect x="26.04" y="6.78" width="1.24" height="19.22" fill="currentColor"></rect>
-      <rect x="29.76" y="13.88" width="1.24" height="12.12" fill="currentColor"></rect>
-      <rect x="33.48" y="10.98" width="1.24" height="15.02" fill="currentColor"></rect>
-      <rect x="37.20" y="19.08" width="1.24" height="6.92" fill="currentColor"></rect>
-      <rect x="40.92" y="15.67" width="1.24" height="10.33" fill="currentColor"></rect>
-      <rect x="44.64" y="12.78" width="1.24" height="13.22" fill="currentColor"></rect>
-      <rect x="48.36" y="5.47" width="1.24" height="20.53" fill="currentColor"></rect>
-      <rect x="52.08" y="12.48" width="1.24" height="13.52" fill="currentColor"></rect>
-      <rect x="55.80" y="6.10" width="1.24" height="19.90" fill="currentColor"></rect>
-      <rect x="59.52" y="19.07" width="1.24" height="6.93" fill="currentColor"></rect>
-      <rect x="63.24" y="15.25" width="1.24" height="10.75" fill="currentColor"></rect>
-      <rect x="66.96" y="6.24" width="1.24" height="19.76" fill="currentColor"></rect>
-      <rect x="70.68" y="7.72" width="1.24" height="18.28" fill="currentColor"></rect>
-      <rect x="74.40" y="11.53" width="1.24" height="14.47" fill="currentColor"></rect>
-      <rect x="78.12" y="4.65" width="1.24" height="21.35" fill="currentColor"></rect>
-      <rect x="81.84" y="18.60" width="1.24" height="7.40" fill="currentColor"></rect>
-      <rect x="85.56" y="17.42" width="1.24" height="8.58" fill="currentColor"></rect>
-      <rect x="89.28" y="5.00" width="1.24" height="21.00" fill="currentColor"></rect>
-      <rect x="93.00" y="3.86" width="1.24" height="22.14" fill="currentColor"></rect>
-      <rect x="96.72" y="15.90" width="1.24" height="10.10" fill="currentColor"></rect>
-      <rect x="100.44" y="10.35" width="1.24" height="15.65" fill="currentColor"></rect>
-      <rect x="104.16" y="16.62" width="1.24" height="9.38" fill="currentColor"></rect>
-      <rect x="107.88" y="15.18" width="1.24" height="10.82" fill="currentColor"></rect>
-      <rect x="111.60" y="6.26" width="1.24" height="19.74" fill="currentColor"></rect>
-      <rect x="115.32" y="-0.74" width="1.24" height="26.74" fill="currentColor"></rect>
-      <rect x="119.04" y="13.18" width="1.24" height="12.82" fill="currentColor"></rect>
-      <rect x="122.76" y="2.05" width="1.24" height="23.95" fill="currentColor"></rect>
-      <rect x="126.48" y="18.45" width="1.24" height="7.55" fill="currentColor"></rect>
-      <rect x="130.20" y="15.43" width="1.24" height="10.57" fill="currentColor"></rect>
-      <rect x="133.92" y="6.07" width="1.24" height="19.93" fill="currentColor"></rect>
-      <rect x="137.64" y="0.56" width="1.24" height="25.44" fill="currentColor"></rect>
-      <rect x="141.36" y="11.18" width="1.24" height="14.82" fill="currentColor"></rect>
-      <rect x="145.08" y="5.80" width="1.24" height="20.20" fill="currentColor"></rect>
-      <rect x="148.80" y="17.18" width="1.24" height="8.82" fill="currentColor"></rect>
-      <rect x="152.52" y="17.97" width="1.24" height="8.03" fill="currentColor"></rect>
-      <rect x="156.24" y="11.10" width="1.24" height="14.90" fill="currentColor"></rect>
-      <rect x="159.96" y="4.41" width="1.24" height="21.59" fill="currentColor"></rect>
-      <rect x="163.68" y="15.98" width="1.24" height="10.02" fill="currentColor"></rect>
-      <rect x="167.40" y="9.06" width="1.24" height="16.94" fill="currentColor"></rect>
-      <rect x="171.12" y="19.54" width="1.24" height="6.46" fill="currentColor"></rect>
-      <rect x="174.84" y="16.81" width="1.24" height="9.19" fill="currentColor"></rect>
-      <rect x="178.56" y="7.69" width="1.24" height="18.31" fill="currentColor"></rect>
-      <rect x="182.28" y="3.53" width="1.24" height="22.47" fill="currentColor"></rect>
-      <rect x="186.00" y="14.20" width="1.24" height="11.80" fill="currentColor"></rect>
-      <rect x="189.72" y="9.28" width="1.24" height="16.72" fill="currentColor"></rect>
-      <rect x="193.44" y="18.89" width="1.24" height="7.11" fill="currentColor"></rect>
-      <rect x="197.16" y="13.51" width="1.24" height="12.49" fill="currentColor"></rect>
-      <rect x="200.88" y="7.59" width="1.24" height="18.41" fill="currentColor"></rect>
-      <rect x="204.60" y="0.67" width="1.24" height="25.33" fill="currentColor"></rect>
-      <rect x="208.32" y="15.42" width="1.24" height="10.58" fill="currentColor"></rect>
-      <rect x="212.04" y="4.36" width="1.24" height="21.64" fill="currentColor"></rect>
-      <rect x="215.76" y="19.29" width="1.24" height="6.71" fill="currentColor"></rect>
-      <rect x="219.48" y="16.30" width="1.24" height="9.70" fill="currentColor"></rect>
-      <rect x="223.20" y="4.73" width="1.24" height="21.27" fill="currentColor"></rect>
-      <rect x="226.92" y="0.31" width="1.24" height="25.69" fill="currentColor"></rect>
-      <rect x="230.64" y="13.05" width="1.24" height="12.95" fill="currentColor"></rect>
-      <rect x="234.36" y="4.78" width="1.24" height="21.22" fill="currentColor"></rect>
-      <rect x="238.08" y="16.64" width="1.24" height="9.36" fill="currentColor"></rect>
-      <rect x="241.80" y="14.31" width="1.24" height="11.69" fill="currentColor"></rect>
-      <rect x="245.52" y="11.09" width="1.24" height="14.91" fill="currentColor"></rect>
-      <rect x="249.24" y="7.42" width="1.24" height="18.58" fill="currentColor"></rect>
-      <rect x="252.96" y="14.53" width="1.24" height="11.47" fill="currentColor"></rect>
-      <rect x="256.68" y="8.73" width="1.24" height="17.27" fill="currentColor"></rect>
-      <rect x="260.40" y="19.11" width="1.24" height="6.89" fill="currentColor"></rect>
-      <rect x="264.12" y="13.48" width="1.24" height="12.52" fill="currentColor"></rect>
-      <rect x="267.84" y="5.68" width="1.24" height="20.32" fill="currentColor"></rect>
-      <rect x="271.56" y="4.12" width="1.24" height="21.88" fill="currentColor"></rect>
-      <rect x="275.28" y="12.45" width="1.24" height="13.55" fill="currentColor"></rect>
-      <rect x="279.00" y="7.52" width="1.24" height="18.48" fill="currentColor"></rect>
-      <rect x="282.72" y="16.36" width="1.24" height="9.64" fill="currentColor"></rect>
-      <rect x="286.44" y="15.90" width="1.24" height="10.10" fill="currentColor"></rect>
-      <rect x="290.16" y="10.79" width="1.24" height="15.21" fill="currentColor"></rect>
-      <rect x="293.88" y="4.91" width="1.24" height="21.09" fill="currentColor"></rect>
-      <rect x="297.60" y="13.03" width="1.24" height="12.97" fill="currentColor"></rect>
-      <rect x="301.32" y="8.78" width="1.24" height="17.22" fill="currentColor"></rect>
-      <rect x="305.04" y="17.65" width="1.24" height="8.35" fill="currentColor"></rect>
-      <rect x="308.76" y="13.70" width="1.24" height="12.30" fill="currentColor"></rect>
+          <rect x="0.00" y="7.66" width="1.24" height="18.34" fill="currentColor"/>
+          <rect x="3.72" y="7.51" width="1.24" height="18.49" fill="currentColor"/>
+          <rect x="7.44" y="14.78" width="1.24" height="11.22" fill="currentColor"/>
+          <rect x="11.16" y="9.15" width="1.24" height="16.85" fill="currentColor"/>
+          <rect x="14.88" y="17.06" width="1.24" height="8.94" fill="currentColor"/>
+          <rect x="18.60" y="14.81" width="1.24" height="11.19" fill="currentColor"/>
+          <rect x="22.32" y="5.55" width="1.24" height="20.45" fill="currentColor"/>
+          <rect x="26.04" y="6.78" width="1.24" height="19.22" fill="currentColor"/>
+          <rect x="29.76" y="13.88" width="1.24" height="12.12" fill="currentColor"/>
+          <rect x="33.48" y="10.98" width="1.24" height="15.02" fill="currentColor"/>
+          <rect x="37.20" y="19.08" width="1.24" height="6.92" fill="currentColor"/>
+          <rect x="40.92" y="15.67" width="1.24" height="10.33" fill="currentColor"/>
+          <rect x="44.64" y="12.78" width="1.24" height="13.22" fill="currentColor"/>
+          <rect x="48.36" y="5.47" width="1.24" height="20.53" fill="currentColor"/>
+          <rect x="52.08" y="12.48" width="1.24" height="13.52" fill="currentColor"/>
+          <rect x="55.80" y="6.10" width="1.24" height="19.90" fill="currentColor"/>
+          <rect x="59.52" y="19.07" width="1.24" height="6.93" fill="currentColor"/>
+          <rect x="63.24" y="15.25" width="1.24" height="10.75" fill="currentColor"/>
+          <rect x="66.96" y="6.24" width="1.24" height="19.76" fill="currentColor"/>
+          <rect x="70.68" y="7.72" width="1.24" height="18.28" fill="currentColor"/>
+          <rect x="74.40" y="11.53" width="1.24" height="14.47" fill="currentColor"/>
+          <rect x="78.12" y="4.65" width="1.24" height="21.35" fill="currentColor"/>
+          <rect x="81.84" y="18.60" width="1.24" height="7.40" fill="currentColor"/>
+          <rect x="85.56" y="17.42" width="1.24" height="8.58" fill="currentColor"/>
+          <rect x="89.28" y="5.00" width="1.24" height="21.00" fill="currentColor"/>
+          <rect x="93.00" y="3.86" width="1.24" height="22.14" fill="currentColor"/>
+          <rect x="96.72" y="15.90" width="1.24" height="10.10" fill="currentColor"/>
+          <rect x="100.44" y="10.35" width="1.24" height="15.65" fill="currentColor"/>
+          <rect x="104.16" y="16.62" width="1.24" height="9.38" fill="currentColor"/>
+          <rect x="107.88" y="15.18" width="1.24" height="10.82" fill="currentColor"/>
+          <rect x="111.60" y="6.26" width="1.24" height="19.74" fill="currentColor"/>
+          <rect x="115.32" y="-0.74" width="1.24" height="26.74" fill="currentColor"/>
+          <rect x="119.04" y="13.18" width="1.24" height="12.82" fill="currentColor"/>
+          <rect x="122.76" y="2.05" width="1.24" height="23.95" fill="currentColor"/>
+          <rect x="126.48" y="18.45" width="1.24" height="7.55" fill="currentColor"/>
+          <rect x="130.20" y="15.43" width="1.24" height="10.57" fill="currentColor"/>
+          <rect x="133.92" y="6.07" width="1.24" height="19.93" fill="currentColor"/>
+          <rect x="137.64" y="0.56" width="1.24" height="25.44" fill="currentColor"/>
+          <rect x="141.36" y="11.18" width="1.24" height="14.82" fill="currentColor"/>
+          <rect x="145.08" y="5.80" width="1.24" height="20.20" fill="currentColor"/>
+          <rect x="148.80" y="17.18" width="1.24" height="8.82" fill="currentColor"/>
+          <rect x="152.52" y="17.97" width="1.24" height="8.03" fill="currentColor"/>
+          <rect x="156.24" y="11.10" width="1.24" height="14.90" fill="currentColor"/>
+          <rect x="159.96" y="4.41" width="1.24" height="21.59" fill="currentColor"/>
+          <rect x="163.68" y="15.98" width="1.24" height="10.02" fill="currentColor"/>
+          <rect x="167.40" y="9.06" width="1.24" height="16.94" fill="currentColor"/>
+          <rect x="171.12" y="19.54" width="1.24" height="6.46" fill="currentColor"/>
+          <rect x="174.84" y="16.81" width="1.24" height="9.19" fill="currentColor"/>
+          <rect x="178.56" y="7.69" width="1.24" height="18.31" fill="currentColor"/>
+          <rect x="182.28" y="3.53" width="1.24" height="22.47" fill="currentColor"/>
+          <rect x="186.00" y="14.20" width="1.24" height="11.80" fill="currentColor"/>
+          <rect x="189.72" y="9.28" width="1.24" height="16.72" fill="currentColor"/>
+          <rect x="193.44" y="18.89" width="1.24" height="7.11" fill="currentColor"/>
+          <rect x="197.16" y="13.51" width="1.24" height="12.49" fill="currentColor"/>
+          <rect x="200.88" y="7.59" width="1.24" height="18.41" fill="currentColor"/>
+          <rect x="204.60" y="0.67" width="1.24" height="25.33" fill="currentColor"/>
+          <rect x="208.32" y="15.42" width="1.24" height="10.58" fill="currentColor"/>
+          <rect x="212.04" y="4.36" width="1.24" height="21.64" fill="currentColor"/>
+          <rect x="215.76" y="19.29" width="1.24" height="6.71" fill="currentColor"/>
+          <rect x="219.48" y="16.30" width="1.24" height="9.70" fill="currentColor"/>
+          <rect x="223.20" y="4.73" width="1.24" height="21.27" fill="currentColor"/>
+          <rect x="226.92" y="0.31" width="1.24" height="25.69" fill="currentColor"/>
+          <rect x="230.64" y="13.05" width="1.24" height="12.95" fill="currentColor"/>
+          <rect x="234.36" y="4.78" width="1.24" height="21.22" fill="currentColor"/>
+          <rect x="238.08" y="16.64" width="1.24" height="9.36" fill="currentColor"/>
+          <rect x="241.80" y="14.31" width="1.24" height="11.69" fill="currentColor"/>
+          <rect x="245.52" y="11.09" width="1.24" height="14.91" fill="currentColor"/>
+          <rect x="249.24" y="7.42" width="1.24" height="18.58" fill="currentColor"/>
+          <rect x="252.96" y="14.53" width="1.24" height="11.47" fill="currentColor"/>
+          <rect x="256.68" y="8.73" width="1.24" height="17.27" fill="currentColor"/>
+          <rect x="260.40" y="19.11" width="1.24" height="6.89" fill="currentColor"/>
+          <rect x="264.12" y="13.48" width="1.24" height="12.52" fill="currentColor"/>
+          <rect x="267.84" y="5.68" width="1.24" height="20.32" fill="currentColor"/>
+          <rect x="271.56" y="4.12" width="1.24" height="21.88" fill="currentColor"/>
+          <rect x="275.28" y="12.45" width="1.24" height="13.55" fill="currentColor"/>
+          <rect x="279.00" y="7.52" width="1.24" height="18.48" fill="currentColor"/>
+          <rect x="282.72" y="16.36" width="1.24" height="9.64" fill="currentColor"/>
+          <rect x="286.44" y="15.90" width="1.24" height="10.10" fill="currentColor"/>
+          <rect x="290.16" y="10.79" width="1.24" height="15.21" fill="currentColor"/>
+          <rect x="293.88" y="4.91" width="1.24" height="21.09" fill="currentColor"/>
+          <rect x="297.60" y="13.03" width="1.24" height="12.97" fill="currentColor"/>
+          <rect x="301.32" y="8.78" width="1.24" height="17.22" fill="currentColor"/>
+          <rect x="305.04" y="17.65" width="1.24" height="8.35" fill="currentColor"/>
+          <rect x="308.76" y="13.70" width="1.24" height="12.30" fill="currentColor"/>
         </g>
         <defs>
           <clipPath id="clip-played">
-            <rect id="clip-p-rect" x="0" y="0" width="0" height="26"></rect>
+            <rect id="clip-p-rect" x="0" y="0" width="0" height="26"/>
           </clipPath>
           <clipPath id="clip-unplayed">
-            <rect id="clip-u-rect" x="0" y="0" width="310.00" height="26"></rect>
+            <rect id="clip-u-rect" x="0" y="0" width="310.00" height="26"/>
           </clipPath>
         </defs>
       </svg>
     </div>
   </div>
-  <audio id="audio" src="https://drive.google.com/uc?export=download&id=1E8QtE2OWGq3D_ctPyeDogwblJgx2eUD5" preload="auto"></audio>
+  <audio id="audio" src="audio/track.mp3" preload="auto"></audio>
 </footer>
 
 <script>
+// ── MUSIC ──────────────────────────────────────────────
 var audio = document.getElementById('audio');
-  var musicStarted = false;
-  function startAudio() {
-    if (musicStarted) return;
-    musicStarted = true;
-    audio.play().then(function() {
-      document.getElementById('icon-play').style.display = 'none';
-      document.getElementById('icon-pause').style.display = '';
-    }).catch(function() {
-      musicStarted = false;
-    });
-  }
-  ['click', 'scroll', 'keydown', 'touchstart'].forEach(function(ev) {
-    document.addEventListener(ev, startAudio, { once: true });
+
+function setPlayIcon(playing) {
+  document.getElementById('icon-play').style.display  = playing ? 'none' : '';
+  document.getElementById('icon-pause').style.display = playing ? ''     : 'none';
+}
+
+// autoplay on first user interaction
+var autoStarted = false;
+function tryAutoStart() {
+  if (autoStarted) return;
+  autoStarted = true;
+  audio.play().then(function() {
+    setPlayIcon(true);
+  }).catch(function() {
+    autoStarted = false; // retry on next interaction
   });
-var clipP = document.getElementById('clip-p-rect');
-var clipU = document.getElementById('clip-u-rect');
+}
+['click','scroll','keydown','touchstart'].forEach(function(ev) {
+  document.addEventListener(ev, tryAutoStart);
+});
+
+var clipP  = document.getElementById('clip-p-rect');
+var clipU  = document.getElementById('clip-u-rect');
 var totalW = 310.00;
 
 audio.addEventListener('timeupdate', function() {
@@ -625,358 +411,155 @@ audio.addEventListener('timeupdate', function() {
   clipU.setAttribute('x', w);
   clipU.setAttribute('width', totalW - w);
 });
-
 audio.addEventListener('ended', function() {
-  document.getElementById('icon-play').style.display = '';
-  document.getElementById('icon-pause').style.display = 'none';
+  setPlayIcon(false);
 });
+audio.addEventListener('play',  function() { setPlayIcon(true);  });
+audio.addEventListener('pause', function() { setPlayIcon(false); });
 
 function togglePlay() {
   if (audio.paused) {
     audio.play();
-    document.getElementById('icon-play').style.display = 'none';
-    document.getElementById('icon-pause').style.display = '';
   } else {
     audio.pause();
-    document.getElementById('icon-play').style.display = '';
-    document.getElementById('icon-pause').style.display = 'none';
   }
 }
-
 function seek(e) {
   var rect = document.getElementById('waveform-wrap').getBoundingClientRect();
-  var pct = (e.clientX - rect.left) / rect.width;
-  audio.currentTime = pct * (audio.duration || 0);
+  audio.currentTime = ((e.clientX - rect.left) / rect.width) * (audio.duration || 0);
 }
-</script>
 
-<script>
-  /*
-   * ─────────────────────────────────────────────
-   * LIGHTERS DATA
-   * Replace each `front` and `back` with the
-   * actual paths to your lighter images.
-   * e.g. front: "images/lighter-01-front.jpg"
-   * ─────────────────────────────────────────────
-   * The array has 46 slots matching your photo.
-   * Add a `label` if you want a tooltip on hover.
-   */
-  const lighters = [
-  { front: "images/front_00.png", back: "images/back_00.png", extra1: "images/extra1_00.png", extra2: "" },
-  { front: "images/front_01.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_02.png", back: "images/back_02.png", extra1: "images/extra1_02.png", extra2: "images/extra2_02.png" },
-  { front: "images/front_03.png", back: "images/back_03.png", extra1: "images/extra1_03.png", extra2: "" },
-  { front: "images/front_04.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_05.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_06.png", back: "images/back_06.png", extra1: "images/extra1_06.png", extra2: "images/extra2_06.png" },
-  { front: "images/front_07.png", back: "images/back_07.png", extra1: "images/extra1_07.png", extra2: "images/extra2_07.png" },
-  { front: "images/front_08.png", back: "images/back_08.png", extra1: "images/extra1_08.png", extra2: "" },
-  { front: "images/front_09.png", back: "images/back_09.png", extra1: "images/extra1_09.png", extra2: "images/extra2_09.png" },
-  { front: "images/front_10.png", back: "images/back_10.png", extra1: "images/extra1_10.png", extra2: "" },
-  { front: "images/front_11.png", back: "images/back_11.png", extra1: "images/extra1_11.png", extra2: "images/extra2_11.png" },
-  { front: "images/front_12.png", back: "images/back_12.png", extra1: "images/extra1_12.png", extra2: "" },
-  { front: "images/front_13.png", back: "images/back_13.png", extra1: "images/extra1_13.png", extra2: "" },
-  { front: "images/front_14.png", back: "images/back_14.png", extra1: "images/extra1_14.png", extra2: "" },
-  { front: "images/front_15.png", back: "images/back_15.png", extra1: "images/extra1_15.png", extra2: "" },
-  { front: "images/front_16.png", back: "images/back_16.png", extra1: "images/extra1_16.png", extra2: "" },
-  { front: "images/front_17.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_18.png", back: "images/back_18.png", extra1: "images/extra1_18.png", extra2: "" },
-  { front: "images/front_19.png", back: "images/back_19.png", extra1: "images/extra1_19.png", extra2: "" },
-  { front: "images/front_20.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_21.png", back: "images/back_21.png", extra1: "images/extra1_21.png", extra2: "images/extra2_21.png" },
-  { front: "images/front_22.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_23.png", back: "images/back_23.png", extra1: "images/extra1_23.png", extra2: "" },
-  { front: "images/front_24.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_25.png", back: "images/back_25.png", extra1: "images/extra1_25.png", extra2: "images/extra2_25.png" },
-  { front: "images/front_26.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_27.png", back: "images/back_27.png", extra1: "images/extra1_27.png", extra2: "" },
-  { front: "images/front_28.png", back: "images/back_28.png", extra1: "images/extra1_28.png", extra2: "images/extra2_28.png" },
-  { front: "images/front_29.png", back: "images/back_29.png", extra1: "images/extra1_29.png", extra2: "" },
-  { front: "images/front_30.png", back: "images/back_30.png", extra1: "images/extra1_30.png", extra2: "images/extra2_30.png" },
-  { front: "images/front_31.png", back: "images/back_31.png", extra1: "images/extra1_31.png", extra2: "" },
-  { front: "images/front_32.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_33.png", back: "images/back_33.png", extra1: "images/extra1_33.png", extra2: "" },
-  { front: "images/front_34.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_35.png", back: "images/back_35.png", extra1: "images/extra1_35.png", extra2: "" },
-  { front: "images/front_36.png", back: "images/back_36.png", extra1: "images/extra1_36.png", extra2: "" },
-  { front: "images/front_37.png", back: "images/back_37.png", extra1: "images/extra1_37.png", extra2: "" },
-  { front: "images/front_38.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_39.png", back: "images/back_39.png", extra1: "images/extra1_39.png", extra2: "images/extra2_39.png" },
-  { front: "images/front_40.png", back: "images/back_40.png", extra1: "images/extra1_40.png", extra2: "" },
-  { front: "images/front_41.png", back: "images/back_41.png", extra1: "images/extra1_41.png", extra2: "" },
-  { front: "images/front_42.png", back: "images/back_42.png", extra1: "images/extra1_42.png", extra2: "" },
-  { front: "images/front_43.png", back: "images/back_43.png", extra1: "images/extra1_43.png", extra2: "" },
-  { front: "images/front_44.png", back: "images/back_44.png", extra1: "images/extra1_44.png", extra2: "" },
-  { front: "images/front_45.png", back: "images/back_45.png", extra1: "images/extra1_45.png", extra2: "" }
+// ── LIGHTERS DATA ──────────────────────────────────────
+// front: always present  |  back: "" if no back photo
+const lighters = [
+  { front: "images/front_00.png", back: "images/back_00.png" },
+  { front: "images/front_01.png", back: "" },
+  { front: "images/front_02.png", back: "images/back_02.png" },
+  { front: "images/front_03.png", back: "images/back_03.png" },
+  { front: "images/front_04.png", back: "" },
+  { front: "images/front_05.png", back: "" },
+  { front: "images/front_06.png", back: "images/back_06.png" },
+  { front: "images/front_07.png", back: "images/back_07.png" },
+  { front: "images/front_08.png", back: "images/back_08.png" },
+  { front: "images/front_09.png", back: "images/back_09.png" },
+  { front: "images/front_10.png", back: "images/back_10.png" },
+  { front: "images/front_11.png", back: "images/back_11.png" },
+  { front: "images/front_12.png", back: "images/back_12.png" },
+  { front: "images/front_13.png", back: "images/back_13.png" },
+  { front: "images/front_14.png", back: "images/back_14.png" },
+  { front: "images/front_15.png", back: "images/back_15.png" },
+  { front: "images/front_16.png", back: "images/back_16.png" },
+  { front: "images/front_17.png", back: "" },
+  { front: "images/front_18.png", back: "images/back_18.png" },
+  { front: "images/front_19.png", back: "images/back_19.png" },
+  { front: "images/front_20.png", back: "" },
+  { front: "images/front_21.png", back: "images/back_21.png" },
+  { front: "images/front_22.png", back: "" },
+  { front: "images/front_23.png", back: "images/back_23.png" },
+  { front: "images/front_24.png", back: "" },
+  { front: "images/front_25.png", back: "images/back_25.png" },
+  { front: "images/front_26.png", back: "" },
+  { front: "images/front_27.png", back: "images/back_27.png" },
+  { front: "images/front_28.png", back: "images/back_28.png" },
+  { front: "images/front_29.png", back: "images/back_29.png" },
+  { front: "images/front_30.png", back: "images/back_30.png" },
+  { front: "images/front_31.png", back: "images/back_31.png" },
+  { front: "images/front_32.png", back: "" },
+  { front: "images/front_33.png", back: "images/back_33.png" },
+  { front: "images/front_34.png", back: "" },
+  { front: "images/front_35.png", back: "images/back_35.png" },
+  { front: "images/front_36.png", back: "images/back_36.png" },
+  { front: "images/front_37.png", back: "images/back_37.png" },
+  { front: "images/front_38.png", back: "" },
+  { front: "images/front_39.png", back: "images/back_39.png" },
+  { front: "images/front_40.png", back: "images/back_40.png" },
+  { front: "images/front_41.png", back: "images/back_41.png" },
+  { front: "images/front_42.png", back: "images/back_42.png" },
+  { front: "images/front_43.png", back: "images/back_43.png" },
+  { front: "images/front_44.png", back: "images/back_44.png" },
+  { front: "images/front_45.png", back: "images/back_45.png" }
 ];
 
-  const grid = document.getElementById('grid');
+// ── INDIVIDUAL WIDTH OVERRIDES ─────────────────────────
+var indWidths = {8:48, 4:52, 32:52, 22:56, 20:46, 33:54, 39:42, 41:52, 42:48, 45:52};
 
-  var indWidths = {8:48,4:52,32:52,22:56,20:46,33:54,39:42,41:52,42:48,45:52};
+// ── BUILD GRID ─────────────────────────────────────────
+var grid = document.getElementById('grid');
 
-  // Shuffle lighters on every load
-  var shuffled = lighters.slice();
-  for (var s = shuffled.length - 1; s > 0; s--) {
-    var r = Math.floor(Math.random() * (s + 1));
-    var tmp = shuffled[s]; shuffled[s] = shuffled[r]; shuffled[r] = tmp;
-  }
+// Shuffle
+var shuffled = lighters.slice();
+for (var s = shuffled.length - 1; s > 0; s--) {
+  var r = Math.floor(Math.random() * (s + 1));
+  var tmp = shuffled[s]; shuffled[s] = shuffled[r]; shuffled[r] = tmp;
+}
 
-  shuffled.forEach((l, i) => {
-    const div = document.createElement('div');
-    div.className = 'lighter';
-    div.dataset.idx = i;
-    if (indWidths[i]) div.style.width = indWidths[i] + 'px';
-    if (l.label) div.title = l.label;
+shuffled.forEach(function(l, i) {
+  var div = document.createElement('div');
+  div.className = 'lighter';
+  div.dataset.idx = i;
+  if (indWidths[i]) div.style.width = indWidths[i] + 'px';
 
-    const front = document.createElement('img');
-    front.className = 'front';
-    front.src = l.front;
-    front.alt = l.label || `lighter ${i + 1}`;
+  // front image (always visible)
+  var front = document.createElement('img');
+  front.className = 'front';
+  front.src = l.front;
+  front.alt = 'lighter ' + (i + 1);
+  div.appendChild(front);
 
-    div.appendChild(front);
+  // photo cycle: [front] or [front, back]
+  div._photos = [l.front];
+  if (l.back) div._photos.push(l.back);
+  div._photoIdx = 0;
 
-    // back + extra photos: stored in div.dataset
-    div._photos = [l.front];
-    if (l.back) {
-      const back = document.createElement('img');
-      back.className = 'back';
-      back.src = l.back;
-      back.style.display = 'none';
-      div.appendChild(back);
-      div._photos.push(l.back);
-    }
-    div._photoIdx = 0;
+  // click counter badge
+  var badge = document.createElement('div');
+  badge.className = 'lighter-count';
+  badge.innerHTML = '<span>0</span>';
+  div.appendChild(badge);
 
-    // counter badge
-    const badge = document.createElement('div');
-    badge.className = 'lighter-count';
-    badge.innerHTML = '<span>0</span>';
-    div.appendChild(badge);
+  grid.appendChild(div);
+});
 
-    grid.appendChild(div);
-  });
+// ── INTERACTIONS ───────────────────────────────────────
+var tooltip = document.getElementById('hover-label');
 
-  
-
-</script>
-
-
-
-<!-- hover + counter + extra photos -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<div id="hover-label" style="left: 1217px; top: 770px; display: none;">i have the same</div>
-<div id="photo-panel" style="display: block; left: 1071px; top: 495px;">
-  <button id="photo-panel-close">×</button>
-  <h4>extra photos — #<span id="panel-num">46</span></h4>
-  <div class="photo-slot">
-    <label>photo 1</label>
-    <input type="file" accept="image/*" id="extra-input-0">
-    <img id="extra-preview-0" style="display: block;">
-  </div>
-  <div class="photo-slot">
-    <label>photo 2</label>
-    <input type="file" accept="image/*" id="extra-input-1">
-    <img id="extra-preview-1" src="" style="display: none;">
-  </div>
-  <button id="save-btn" onclick="saveHTML()" style="width:100%;margin-top:8px;padding:7px;background:#111;color:#fff;border:none;border-radius:5px;cursor:pointer;font-family:monospace;font-size:12px;">save file with photos</button>
-</div>
-
-<script>
-var tooltip   = document.getElementById('hover-label');
-var panel     = document.getElementById('photo-panel');
-var panelIdx  = -1;
-
-// move tooltip with mouse
+// tooltip follows mouse
 document.addEventListener('mousemove', function(e) {
   tooltip.style.left = e.clientX + 'px';
   tooltip.style.top  = e.clientY + 'px';
 });
 
-function setupLighters() {
-  document.querySelectorAll('.lighter').forEach(function(el) {
-    var idx = parseInt(el.dataset.idx);
-
-    // hover tooltip
-    el.addEventListener('mouseenter', function() {
-      tooltip.style.display = 'flex';
-    });
-    el.addEventListener('mouseleave', function() {
-      tooltip.style.display = 'none';
-    });
-
-    // left click → increment counter
-    el.addEventListener('click', function(e) {
-      if (e.button !== 0) return;
-      var badge = el.querySelector('.lighter-count');
-      var span  = badge.querySelector('span');
-      var n = parseInt(span.textContent) + 1;
-      span.textContent = n;
-      badge.style.display = 'flex';
-    });
-
-    // right-click → open photo panel
-    el.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-      openPhotoPanel(idx, el, e.clientX, e.clientY);
-    });
-  });
-}
-
-function openPhotoPanel(idx, el, x, y) {
-  panelIdx = idx;
-  document.getElementById('panel-num').textContent = idx + 1;
-
-  // restore existing extra photos
-  var extras = el._extras || [];
-  [0,1].forEach(function(s) {
-    var inp  = document.getElementById('extra-input-' + s);
-    var prev = document.getElementById('extra-preview-' + s);
-    inp.value = '';
-    if (extras[s]) { prev.src = extras[s]; prev.style.display = 'block'; }
-    else           { prev.src = '';        prev.style.display = 'none';  }
-  });
-
-  // position
-  var pw = 220;
-  panel.style.display = 'block';
-  var left = Math.min(x + 10, window.innerWidth  - pw - 16);
-  var top  = Math.min(y + 10, window.innerHeight - 200 - 16);
-  panel.style.left = left + 'px';
-  panel.style.top  = top  + 'px';
-}
-
-document.getElementById('photo-panel-close').onclick = function() {
-  panel.style.display = 'none';
-};
-
-[0,1].forEach(function(s) {
-  document.getElementById('extra-input-' + s).onchange = function() {
-    var file = this.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var src = e.target.result;
-      var prev = document.getElementById('extra-preview-' + s);
-      prev.src = src; prev.style.display = 'block';
-
-      // attach to lighter element
-      var el = document.querySelector('.lighter[data-idx="' + panelIdx + '"]');
-      if (!el._extras) el._extras = [];
-      el._extras[s] = src;
-      if (s === 0) el._back = src;  // slot 0 = back photo
-      // rebuild photo cycle array: front → back → extra2
-      el._photos = [el.querySelector('.front').src];
-      if (el._extras[0]) el._photos.push(el._extras[0]);
-      if (el._extras[1]) el._photos.push(el._extras[1]);
-      el._photoIdx = 0;
-    };
-    reader.readAsDataURL(file);
-  };
-});
-
-// hover photo cycling: front → extra1 → extra2 → loop
 document.querySelectorAll('.lighter').forEach(function(el) {
+
+  // hover → show tooltip + instantly swap to back, restore on leave
   el.addEventListener('mouseenter', function() {
-    if (!el._photos || el._photos.length < 2) return;
-    el._cycleTimer = setInterval(function() {
-      el._photoIdx = (el._photoIdx + 1) % el._photos.length;
-      el.querySelector('.front').src = el._photos[el._photoIdx];
-    }, 600);
-  });
-  el.addEventListener('mouseleave', function() {
-    clearInterval(el._cycleTimer);
-    // reset to front
-    if (el._photos && el._photos[0]) {
-      el.querySelector('.front').src = el._photos[0];
-      el._photoIdx = 0;
+    tooltip.textContent = 'i have the same';
+    tooltip.style.display = 'flex';
+    if (el._photos.length >= 2) {
+      el.querySelector('img.front').src = el._photos[1];
     }
   });
-});
 
-window.addEventListener('load', function() {
-  setTimeout(setupLighters, 150);
-});
-
-function saveHTML() {
-  // Collect current state of all lighters
-  var els = Array.from(document.querySelectorAll('.lighter'));
-  var newLighters = els.map(function(el) {
-    var front = el.querySelector('img.front').src;
-    // get back: check _photos[1] if it was set from file upload, else empty
-    var back = '';
-    if (el._extras && el._extras[0]) back = el._extras[0];
-    // extra photos stored as _extras[0] and _extras[1]
-    // back should be the designated back photo — use _back if set, else first extra
-    if (el._back) back = el._back;
-    var extra1 = (el._extras && el._extras[0]) ? el._extras[0] : '';
-    var extra2 = (el._extras && el._extras[1]) ? el._extras[1] : '';
-    return { front: front, back: back, extra1: extra1, extra2: extra2 };
+  el.addEventListener('mouseleave', function() {
+    tooltip.style.display = 'none';
+    el.querySelector('img.front').src = el._photos[0];
   });
 
-  // Get current HTML
-  var html = document.documentElement.outerHTML;
+  // left-click → increment counter, change tooltip at 10 consecutive clicks
+  el.addEventListener('click', function() {
+    var badge = el.querySelector('.lighter-count');
+    var span  = badge.querySelector('span');
+    var n = parseInt(span.textContent) + 1;
+    span.textContent = n;
+    badge.style.display = 'flex';
+    el._clicks = (el._clicks || 0) + 1;
+    if (el._clicks >= 10) {
+      tooltip.textContent = "it's mine you thief";
+    }
+  });
 
-  // Replace the lighters array with updated one
-  var newArray = 'const lighters = [
-  { front: "images/front_00.png", back: "images/back_00.png", extra1: "images/extra1_00.png", extra2: "" },
-  { front: "images/front_01.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_02.png", back: "images/back_02.png", extra1: "images/extra1_02.png", extra2: "images/extra2_02.png" },
-  { front: "images/front_03.png", back: "images/back_03.png", extra1: "images/extra1_03.png", extra2: "" },
-  { front: "images/front_04.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_05.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_06.png", back: "images/back_06.png", extra1: "images/extra1_06.png", extra2: "images/extra2_06.png" },
-  { front: "images/front_07.png", back: "images/back_07.png", extra1: "images/extra1_07.png", extra2: "images/extra2_07.png" },
-  { front: "images/front_08.png", back: "images/back_08.png", extra1: "images/extra1_08.png", extra2: "" },
-  { front: "images/front_09.png", back: "images/back_09.png", extra1: "images/extra1_09.png", extra2: "images/extra2_09.png" },
-  { front: "images/front_10.png", back: "images/back_10.png", extra1: "images/extra1_10.png", extra2: "" },
-  { front: "images/front_11.png", back: "images/back_11.png", extra1: "images/extra1_11.png", extra2: "images/extra2_11.png" },
-  { front: "images/front_12.png", back: "images/back_12.png", extra1: "images/extra1_12.png", extra2: "" },
-  { front: "images/front_13.png", back: "images/back_13.png", extra1: "images/extra1_13.png", extra2: "" },
-  { front: "images/front_14.png", back: "images/back_14.png", extra1: "images/extra1_14.png", extra2: "" },
-  { front: "images/front_15.png", back: "images/back_15.png", extra1: "images/extra1_15.png", extra2: "" },
-  { front: "images/front_16.png", back: "images/back_16.png", extra1: "images/extra1_16.png", extra2: "" },
-  { front: "images/front_17.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_18.png", back: "images/back_18.png", extra1: "images/extra1_18.png", extra2: "" },
-  { front: "images/front_19.png", back: "images/back_19.png", extra1: "images/extra1_19.png", extra2: "" },
-  { front: "images/front_20.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_21.png", back: "images/back_21.png", extra1: "images/extra1_21.png", extra2: "images/extra2_21.png" },
-  { front: "images/front_22.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_23.png", back: "images/back_23.png", extra1: "images/extra1_23.png", extra2: "" },
-  { front: "images/front_24.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_25.png", back: "images/back_25.png", extra1: "images/extra1_25.png", extra2: "images/extra2_25.png" },
-  { front: "images/front_26.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_27.png", back: "images/back_27.png", extra1: "images/extra1_27.png", extra2: "" },
-  { front: "images/front_28.png", back: "images/back_28.png", extra1: "images/extra1_28.png", extra2: "images/extra2_28.png" },
-  { front: "images/front_29.png", back: "images/back_29.png", extra1: "images/extra1_29.png", extra2: "" },
-  { front: "images/front_30.png", back: "images/back_30.png", extra1: "images/extra1_30.png", extra2: "images/extra2_30.png" },
-  { front: "images/front_31.png", back: "images/back_31.png", extra1: "images/extra1_31.png", extra2: "" },
-  { front: "images/front_32.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_33.png", back: "images/back_33.png", extra1: "images/extra1_33.png", extra2: "" },
-  { front: "images/front_34.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_35.png", back: "images/back_35.png", extra1: "images/extra1_35.png", extra2: "" },
-  { front: "images/front_36.png", back: "images/back_36.png", extra1: "images/extra1_36.png", extra2: "" },
-  { front: "images/front_37.png", back: "images/back_37.png", extra1: "images/extra1_37.png", extra2: "" },
-  { front: "images/front_38.png", back: "", extra1: "", extra2: "" },
-  { front: "images/front_39.png", back: "images/back_39.png", extra1: "images/extra1_39.png", extra2: "images/extra2_39.png" },
-  { front: "images/front_40.png", back: "images/back_40.png", extra1: "images/extra1_40.png", extra2: "" },
-  { front: "images/front_41.png", back: "images/back_41.png", extra1: "images/extra1_41.png", extra2: "" },
-  { front: "images/front_42.png", back: "images/back_42.png", extra1: "images/extra1_42.png", extra2: "" },
-  { front: "images/front_43.png", back: "images/back_43.png", extra1: "images/extra1_43.png", extra2: "" },
-  { front: "images/front_44.png", back: "images/back_44.png", extra1: "images/extra1_44.png", extra2: "" },
-  { front: "images/front_45.png", back: "images/back_45.png", extra1: "images/extra1_45.png", extra2: "" }
-];';
-
-  html = html.replace(/const lighters = \[.*?\];/s, newArray);
-
-  var blob = new Blob([html], { type: 'text/html' });
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'lighters-museum-saved.html';
-  a.click();
-}
-
+});
 </script>
 
-
-
-</body></html>
+</body>
+</html>
