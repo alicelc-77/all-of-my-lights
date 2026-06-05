@@ -535,31 +535,30 @@ document.addEventListener('mousemove', function(e) {
   tooltip.style.top  = e.clientY + 'px';
 });
 
-// Added 'index' here to uniquely identify each lighter on the page
-document.querySelectorAll('.lighter').forEach(function(el, index) {
+document.querySelectorAll('.lighter').forEach(function(el) {
 
-  // 1. Create a unique save key for this specific lighter
-  var storageKey = 'lighter_count_' + index;
+  // Create a unique key using the front image file path
+  // Example result: "lighter_count_images/blue-bic-front.jpg"
+  var storageKey = 'lighter_count_' + el._photos[0];
 
-  // 2. Grab the badge and span so we can update them immediately
   var badge = el.querySelector('.lighter-count');
   var span  = badge.querySelector('span');
-
-  // 3. Check for saved clicks when the site loads
+  
+  // Check for saved clicks when the site loads
   var savedClicks = localStorage.getItem(storageKey);
   
   if (savedClicks) {
     span.textContent = savedClicks;
-    badge.style.display = 'flex'; // Keep the badge visible if they've clicked before
-    el._clicks = parseInt(savedClicks); // Keep the internal click tracker synced
+    badge.style.display = 'flex'; 
+    el._clicks = parseInt(savedClicks); 
   } else {
-    el._clicks = 0; // Start at 0 if no saved data
+    el._clicks = 0; 
   }
 
   // hover → show tooltip + instantly swap to back, restore on leave
   el.addEventListener('mouseenter', function() {
     
-    // Check if the saved clicks are already at 10 so the tooltip stays correct after a reload
+    // Check click count so the correct tooltip shows immediately on hover
     if (el._clicks >= 10) {
       tooltip.textContent = "it's mine you thief";
     } else {
@@ -582,15 +581,13 @@ document.querySelectorAll('.lighter').forEach(function(el, index) {
 
   // left-click → increment counter, change tooltip at 10 consecutive clicks
   el.addEventListener('click', function() {
-    // We use "|| 0" just in case the span is totally empty on the first click
     var n = (parseInt(span.textContent) || 0) + 1;
     
     span.textContent = n;
     badge.style.display = 'flex';
-    
     el._clicks = (el._clicks || 0) + 1;
     
-    // 4. Save the newly updated count to localStorage
+    // Save the new total to this lighter's specific image-based storage key
     localStorage.setItem(storageKey, n);
 
     if (el._clicks >= 10) {
